@@ -1,0 +1,6 @@
+# TTS==0.20.6
+flask
+flask-cors
+llama_cpp_python
+PySide6
+keyboard
