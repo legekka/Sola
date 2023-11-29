@@ -71,7 +71,7 @@ async def main():
     global tts
 
     print("Initializing TextGenerator API Client...")
-    tg = TextGeneratorAPIClient(host="192.168.1.20")
+    tg = TextGeneratorAPIClient()
     
     print("Initializing GUI...")
     initGui()

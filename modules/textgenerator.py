@@ -52,40 +52,56 @@ class TextGenerator:
             "3489": -0.5, # " Our"
         }
         self.chat_init = ["Initializing ship systems, preparing to launch.", "Sola is getting all the spaceship systems ready, and preparing for a big, exciting launch!"]
-        self.chat_history = self.chat_init
+        self.chat_history = self.chat_init.copy() 
 
-    def split_sentences(self, text):
+    def split_text(self, text):
         # splits text into multiple sentences based on punctuation ".", "!", "?", ";", ":", and newline "\n"
+        # it's important to check the next character after the punctuation, because we don't want to split on for example numbers
 
         sentences = []
         current_sentence = ""
-        for char in text:
-            current_sentence += char
-            if char in [".", "!", "?", ";", ":", "\n"]:
+
+        for i in range(len(text)):
+            current_sentence += text[i]
+            if text[i] in [".", "!", "?", ";", ":", "\n"] and i+1 < len(text) and (text[i+1] == " " or text[i+1] == "\n"):
                 sentences.append(current_sentence)
                 current_sentence = ""
         if current_sentence != "":
             sentences.append(current_sentence)
-        
-        # now check the sections. if a section is less than 150 characters, combine it with the next but only if it keeps the total length under 150 
-        # if the section is longer than 150 characters, it is considered a sentence on its own
-        new_sentences = []
+
+        # A section should be less than 150 characters, one exception:
+        # - If a section would be shorter than 5 words, it can be combined with the next section, or the previous section if it's the last section
+
+        sections = []
         for i in range(len(sentences)):
             if len(sentences[i]) < 150:
                 if i+1 < len(sentences):
                     if len(sentences[i] + sentences[i+1]) < 150:
                         sentences[i+1] = sentences[i] + sentences[i+1]
                     else:
-                        new_sentences.append(sentences[i])
+                        if len(sentences[i].split(" ")) < 5:
+                            sentences[i+1] = sentences[i] + sentences[i+1]
+                        else:
+                            sections.append(sentences[i])
                 else:
-                    new_sentences.append(sentences[i])
+                    sections.append(sentences[i])
             else:
-                new_sentences.append(sentences[i])
+                sections.append(sentences[i])
+
+        # check if the last section is less than 5 words, if so, combine it with the previous section
+        if len(sections) > 1:
+            if len(sections[-1].split(" ")) < 5:
+                print("Combining last two sections")
+                sections[-2] += sections[-1]
+                sections.pop(-1)
+
+        for i in range(len(sections)):
+            print("Section length: " + str(len(sections[i])) + " characters, " + str(len(sections[i].split(" "))) + " words")
 
         # strip whitespace from the sentences
-        for i in range(len(new_sentences)):
-            new_sentences[i] = new_sentences[i].strip()
-        return new_sentences
+        for i in range(len(sections)):
+            sections[i] = sections[i].strip()
+        return sections
 
     def rephrase(self, text, max_tokens=150):
         prompt = self.template.format(system=random.choice(self.system_rephrase_prompts), prompt=text)
@@ -106,7 +122,7 @@ class TextGenerator:
         )
         print("LlamaCpp API time: " + str(round(time.time() - start, 2)) + "s")
 
-        return self.split_sentences(response["choices"][0]["text"])
+        return self.split_text(response["choices"][0]["text"])
         # return [response["choices"][0]["text"]]
 
     def chat(self, text, max_tokens=150):
@@ -145,17 +161,22 @@ class TextGenerator:
         self.chat_history.append(text)
         self.chat_history.append(response)
 
-        # if chat history is more than 20 pairs, we reset to have more variance
-        if len(self.chat_history) > 40:
-            self.chat_history = self.chat_init
+        print("Chat history length: " + str(len(self.chat_history)))
+        # if chat history is more than 15 pairs, we reset to have more variance
+        if len(self.chat_history) > 30:
+            print("Resetting chat history")
+            self.chat_history = self.chat_init.copy()
 
-        return self.split_sentences(response)
+        return self.split_text(response)
         # return [response]
     
 # this class uses the llmapi.py API to communicate with the llama_cpp
 class TextGeneratorAPIClient:
-    def __init__(self, port=6969, host="127.0.0.1") -> None:
-        self.url = f"http://{host}:{port}"
+    def __init__(self, port=6969, host="127.0.0.1", url=None) -> None:
+        if url is not None:
+            self.url = url
+        else:
+            self.url = f"http://{host}:{port}"
 
     async def rephrase(self, text):
         data = {"text": text}
