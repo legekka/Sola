@@ -1,7 +1,0 @@
-{
-    "llamacpp": {
-        "host": "127.0.0.1",
-        "port": 6969,
-        "model_path": "E:/text-generation-webui/models/mistral-7b-openorca.Q2_K.gguf"
-    }
-}

@@ -197,7 +197,7 @@ class TextToSpeech:
         self.channels = 1
         self.sr = 24000
         self.audio = pyaudio.PyAudio()
-        self.device_index = 7   # 7 if no airpods, 8 if airpods
+        self.device_index = 8   # 7 if no airpods, 8 if airpods
         self.audio_list = []
         self.audio_list_meta = []
         # open the audio stream

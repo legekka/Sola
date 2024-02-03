@@ -1,6 +1,6 @@
 from modules.stts import TextToSpeechQueue
 
-tts = TextToSpeechQueue(ref_audio_path="Samples/mark.wav")
+tts = TextToSpeechQueue(ref_audio_path="Samples/Ganyu.wav")
 print("__init__ done.")
 tts.init()
 print("init done.")

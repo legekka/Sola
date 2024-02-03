@@ -1,0 +1,14 @@
+{
+    "host": "127.0.0.1",
+    "port": 6969,
+    "model_path": "E:/text-generation-webui/models/mistral-7b-openorca.Q5_K_M.gguf",
+    "format_path": "formats/ChatML.json",
+    "biases": {
+        "315": -10,
+        "630": -0.5,
+        "478": -0.5,
+        "816": -0.5,
+        "985": -0.5,
+        "3489": -0.5
+    }
+}
