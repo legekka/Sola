@@ -615,7 +615,7 @@ def build_model(args, text_aligner, pitch_extractor, bert):
     assert args.decoder.type in ['istftnet', 'hifigan'], 'Decoder type unknown'
     
     if args.decoder.type == "istftnet":
-        from Modules.istftnet import Decoder
+        from modules.styletts2.Modules.istftnet import Decoder
         decoder = Decoder(dim_in=args.hidden_dim, style_dim=args.style_dim, dim_out=args.n_mels,
                 resblock_kernel_sizes = args.decoder.resblock_kernel_sizes,
                 upsample_rates = args.decoder.upsample_rates,

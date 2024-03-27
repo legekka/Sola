@@ -18,7 +18,7 @@ import time
 import threading
 
 class TextToSpeech:
-    def __init__(self, ref_audio_path="Samples/Ganyu2.wav"):
+    def __init__(self, ref_audio_path="Samples/Ganyu2.wav", model_path="Models/LibriTTS/epochs_2nd_00020.pth", config_path="Models/LibriTTS/config.yml"):
         self.ref_audio_path = ref_audio_path
         self.new_event = None
         self.textcleaner = TextCleaner()
@@ -33,7 +33,7 @@ class TextToSpeech:
             os.environ["PHONEMIZER_ESPEAK_LIBRARY"] = "C:\\Program Files\\eSpeak NG\\libespeak-ng.dll"
         
         self.global_phonemizer = phonemizer.backend.EspeakBackend(language='en-us', preserve_punctuation=True,  with_stress=True)
-        config = yaml.safe_load(open("Models/LibriTTS/config.yml"))
+        config = yaml.safe_load(open(config_path))
 
         self.text_aligner = load_ASR_models(config.get('ASR_path', False), config.get('ASR_config', False))
         self.pitch_extractor = load_F0_models(config.get('F0_path', False))
@@ -44,7 +44,7 @@ class TextToSpeech:
         _ = [self.model[key].eval() for key in self.model]
         _ = [self.model[key].to(self.device) for key in self.model]
 
-        params_whole = torch.load("models/LibriTTS/epochs_2nd_00020.pth", map_location='cpu')
+        params_whole = torch.load(model_path, map_location='cpu')
         params = params_whole['net']
 
         for key in self.model:
@@ -197,7 +197,11 @@ class TextToSpeech:
         self.channels = 1
         self.sr = 24000
         self.audio = pyaudio.PyAudio()
-        self.device_index = 7   # 7 if no airpods, 8 if airpods
+
+        # self.device_index = 18 # run `python audio_devices.py` to get the index of the device
+        
+        self.device_index = 13 # airpods pro
+
         self.audio_list = []
         self.audio_list_meta = []
         # open the audio stream
@@ -252,8 +256,8 @@ class TextToSpeech:
 
 
 class TextToSpeechThreaded(TextToSpeech):
-    def __init__(self, ref_audio_path="Samples/Ganyu2.wav"):
-        super().__init__(ref_audio_path)
+    def __init__(self, ref_audio_path="Samples/Ganyu2.wav", model_path="Models/LibriTTS/epochs_2nd_00020.pth", config_path="Models/LibriTTS/config.yml"):
+        super().__init__(ref_audio_path, model_path, config_path)
         self.thread = None
 
     def run(self, texts):
@@ -269,8 +273,8 @@ class TextToSpeechThreaded(TextToSpeech):
             self.thread.join()
 
 class TextToSpeechQueue(TextToSpeechThreaded):
-    def __init__(self, ref_audio_path="Samples/Ganyu2.wav"):
-        super().__init__(ref_audio_path)
+    def __init__(self, ref_audio_path="Samples/Ganyu2.wav", model_path="Models/LibriTTS/epochs_2nd_00020.pth", config_path="Models/LibriTTS/config.yml"):
+        super().__init__(ref_audio_path, model_path, config_path)
         self.sentences = queue.Queue()
         self.closed = False
 

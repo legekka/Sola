@@ -1,0 +1,14 @@
+{
+    "host": "127.0.0.1",
+    "port": 6969,
+    "model_path": "E:/text-generation-webui/models/tinyllama-1.1b-chat-v1.0.Q8_0.gguf",
+    "format_path": "formats/Zephyr.json",
+    "_biases": {
+        "306": -10,
+        "1183": -0.5,
+        "591": -0.5,
+        "1334": -0.5,
+        "2296": -0.5,
+        "8680": -0.5
+    }
+}

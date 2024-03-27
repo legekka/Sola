@@ -1,0 +1,7 @@
+{
+    "type": "chat",
+    "system_prefix": "<|im_start|>system\n",
+    "user_prefix": "<|im_start|>user\n",
+    "assistant_prefix": "<|im_start|>assistant\n",
+    "end_token": "<|im_end|>"
+}

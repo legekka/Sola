@@ -1,1 +1,3 @@
-models/LibriTTS/*.pth
+__pycache__
+*.pyc
+*.pth

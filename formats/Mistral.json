@@ -1,0 +1,10 @@
+{
+    "type": "instruct",
+    "bos_token": "<s>",
+    "instruct_prefix": " [INST] ",
+    "instruct_suffix": " [/INST] ",
+    "system_prefix": "SYSTEM: ",
+    "user_prefix": "",
+    "assistant_prefix": "",
+    "end_token": "</s>"
+}

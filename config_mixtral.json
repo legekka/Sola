@@ -1,0 +1,14 @@
+{
+    "host": "0.0.0.0",
+    "port": 6969,
+    "model_path": "C:/AI/text-generation-webui/models/mixtral-8x7b-instruct-v0.1.Q3_K_M.gguf",
+    "format_path": "formats/Mistral.json",
+    "biases": {
+        "315": -10,
+        "630": -0.1,
+        "478": -0.1,
+        "816": -0.1,
+        "985": -0.1,
+        "3489": -0.1
+    }
+}

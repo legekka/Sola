@@ -71,10 +71,11 @@ async def main():
     global tts
 
     print("Initializing TextGenerator API Client...")
-    tg = TextGeneratorAPIClient()
+    tg = TextGeneratorAPIClient(host="192.168.1.41")
     
-    print("Initializing GUI...")
-    initGui()
+    # print("Initializing GUI...")
+    # initGui()
+    gui = None
 
     tts = TextToSpeechQueue("Samples/female_reference2.wav")
     tts.init()
