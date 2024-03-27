@@ -1,8 +1,7 @@
-import llama_cpp 
+import llama_cpp_cuda as llama_cpp
 import random
 import time
 
-import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import aiohttp
@@ -31,7 +30,7 @@ def remove_emojis(text):
 class TextGenerator:
     def __init__(self, config={"model_path": "E:/text-generation-webui/models/mistral-7b-openorca.Q5_K_M.gguf", "format_path": "formats/ChatML.json"}):
         self.model = llama_cpp.Llama(model_path=config["model_path"],
-                        n_ctx=8192,
+                        n_ctx=4096,
                         n_batch=512,
                         n_threads=6,
                         n_gpu_layers=128,
@@ -122,9 +121,26 @@ class TextGenerator:
 
         return text
 
+    def clean_text(self, text):
+        # removes any whitespace at the start and end of the text
+        text = text.strip()
+
+        # there are words with - in them, like "well-being", we want to separate them into "well being" (removing the "-"). But only if there's no spaces between the - and the words
+        text = re.sub(r"(\w)-(\w)", r"\1 \2", text)
+    
+        # check if there are any decimal numbers (like 0.22), and replace the "." to " point "
+        text = re.sub(r"(\d+)\.(\d+)", r"\1 point \2", text)
+
+        # also if there are numbers with a comma (like 12,000), remove the comma to be 12000
+        text = re.sub(r"(\d+),(\d+)", r"\1\2", text)
+
+        return text
+
     def split_text(self, text):
         # splits text into multiple sentences based on punctuation ".", "!", "?", ";", ":", and newline "\n"
         # it's important to check the next character after the punctuation, because we don't want to split on for example numbers
+
+        text = self.clean_text(text)
 
         sentences = []
         current_sentence = ""
@@ -147,10 +163,12 @@ class TextGenerator:
                     if len(sentences[i] + sentences[i+1]) < 150:
                         sentences[i+1] = sentences[i] + sentences[i+1]
                     else:
-                        if len(sentences[i].split(" ")) < 5:
+                        if len(sentences[i].split(" ")) < 7:
                             sentences[i+1] = sentences[i] + sentences[i+1]
                         else:
                             sections.append(sentences[i])
+                elif len(sentences[i].split(" ")) < 7:
+                    sections[-1] += sentences[i]
                 else:
                     sections.append(sentences[i])
             else:
@@ -199,7 +217,9 @@ class TextGenerator:
 
     def chat(self, text, max_tokens=150):
         self.system_prompts = self.system_chat_prompts
+        text = text.strip()
         prompt = self.format_prompt(text, history=self.chat_history)
+        print(prompt)
         print("Prompt length: " + str(len(prompt)))
         start = time.time()
         response = self.model(prompt=prompt,
@@ -222,6 +242,7 @@ class TextGenerator:
         print("LlamaCpp API time: " + str(round(time.time() - start, 2)) + "s")
         
         response = remove_emojis(response["choices"][0]["text"])
+        response = response.strip()
         self.chat_history.append(text)
         self.chat_history.append(response)
 

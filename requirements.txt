@@ -1,6 +1,7 @@
 # TTS==0.20.6
 flask
 flask-cors
-llama_cpp_python
+https://github.com/oobabooga/llama-cpp-python-cuBLAS-wheels/releases/download/textgen-webui/llama_cpp_python_cuda-0.2.36+cu121-cp310-cp310-win_amd64.whl
 PySide6
 keyboard
+aiohttp
